@@ -1,1 +1,3 @@
 rootProject.name = 'spring-boot-microservice'
+
+include 'product-service'
