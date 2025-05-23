@@ -1,6 +1,8 @@
 package com.sunyesle.product_service;
 
 import io.restassured.RestAssured;
+import io.restassured.http.ContentType;
+import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -21,6 +23,25 @@ class ProductServiceApplicationTests {
     }
 
     @Test
-    void contextLoads() {
+    void 상품을_생성한다() {
+        String requestBody = """
+                {
+                    "name": "블루투스 이어폰",
+                    "description": "노이즈 캔슬링 기능을 갖춘 무선 이어폰입니다.",
+                    "price": 89000
+                }
+                """;
+
+        RestAssured.given()
+                .contentType(ContentType.JSON)
+                .body(requestBody)
+                .when()
+                .post("/api/products")
+                .then()
+                .statusCode(201)
+                .body("id", Matchers.notNullValue())
+                .body("name", Matchers.equalTo("블루투스 이어폰"))
+                .body("description", Matchers.equalTo("노이즈 캔슬링 기능을 갖춘 무선 이어폰입니다."))
+                .body("price", Matchers.equalTo(89000));
     }
 }
