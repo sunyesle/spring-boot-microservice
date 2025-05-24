@@ -1,3 +1,16 @@
 spring:
   application:
     name: inventory-service
+  datasource:
+    url: jdbc:mysql://localhost:3306/inventory_service
+    username: root
+    password: mysql
+  jpa:
+    hibernate:
+      ddl-auto: none
+    properties:
+      hibernate:
+        globally_quoted_identifiers: true
+        globally_quoted_identifiers_skip_column_definitions: true
+server:
+  port: 8082

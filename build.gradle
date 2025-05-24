@@ -1,5 +1,5 @@
 subprojects {
-	group = 'com.sunyesle.microservice'
+	group = 'com.sunyesle'
 	version = '0.0.1-SNAPSHOT'
 
 	repositories {
