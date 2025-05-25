@@ -12,8 +12,14 @@ import java.util.UUID;
 public class OrderService {
 
     private final OrderRepository orderRepository;
+    private final InventoryClient inventoryClient;
 
     public void placeOrder(OrderRequest orderRequest) {
+        boolean isProductInStock = inventoryClient.isInStock(orderRequest.skuCode(), orderRequest.quantity());
+        if(!isProductInStock) {
+            throw new RuntimeException("Product with SkuCode " + orderRequest.skuCode() + " is not in stock");
+        }
+
         Order order = new Order(
                 UUID.randomUUID().toString(),
                 orderRequest.skuCode(),
