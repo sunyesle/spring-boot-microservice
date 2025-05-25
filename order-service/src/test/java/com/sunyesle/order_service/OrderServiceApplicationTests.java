@@ -1,5 +1,6 @@
 package com.sunyesle.order_service;
 
+import com.sunyesle.order_service.stub.InventoryClientStub;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import org.hamcrest.Matchers;
@@ -7,10 +8,14 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.cloud.contract.wiremock.AutoConfigureWireMock;
 import org.springframework.context.annotation.Import;
+import org.springframework.test.context.ActiveProfiles;
 
+@ActiveProfiles("test")
 @Import(TestcontainersConfiguration.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@AutoConfigureWireMock(port = 0)
 class OrderServiceApplicationTests {
 
 	@LocalServerPort
@@ -31,6 +36,7 @@ class OrderServiceApplicationTests {
 				    "quantity": 1
 				}
 				""";
+		InventoryClientStub.stubInventoryCall("AA000000", 1);
 
 		RestAssured.given()
 				.contentType(ContentType.JSON)
