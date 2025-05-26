@@ -1,3 +1,20 @@
 spring:
   application:
     name: api-gateway
+  cloud:
+    gateway:
+      routes:
+        - id: product_service
+          uri: http://localhost:8080
+          predicates:
+            - Path=/api/products/**
+        - id: order_service
+          uri: http://localhost:8081
+          predicates:
+            - Path=/api/orders/**
+        - id: inventory_service
+          uri: http://localhost:8082
+          predicates:
+            - Path=/api/inventory/**
+server:
+  port: 9000
