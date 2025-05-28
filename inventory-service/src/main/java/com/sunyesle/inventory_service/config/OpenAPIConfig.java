@@ -1,4 +1,4 @@
-package com.sunyesle.inventory_service;
+package com.sunyesle.inventory_service.config;
 
 import io.swagger.v3.oas.models.ExternalDocumentation;
 import io.swagger.v3.oas.models.OpenAPI;
