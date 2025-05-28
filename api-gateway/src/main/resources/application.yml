@@ -1,3 +1,5 @@
+server:
+  port: 9000
 spring:
   application:
     name: api-gateway
@@ -39,8 +41,6 @@ spring:
             - Path=/aggregate/inventory-service/v3/api-docs/**
           filters:
             - SetPath=/api-docs
-server:
-  port: 9000
 springdoc:
   swagger-ui:
     path: /swagger-ui.html
