@@ -15,32 +15,96 @@ spring:
           uri: http://localhost:8080
           predicates:
             - Path=/api/products/**
+          filters:
+            - name: CircuitBreaker
+              args:
+                name: productServiceCircuitBreaker
+                fallbackUri: forward:/fallbackRoute
+
         - id: order_service
           uri: http://localhost:8081
           predicates:
             - Path=/api/orders/**
+          filters:
+            - name: CircuitBreaker
+              args:
+                name: orderServiceCircuitBreaker
+                fallbackUri: forward:/fallbackRoute
+
         - id: inventory_service
           uri: http://localhost:8082
           predicates:
             - Path=/api/inventory/**
+          filters:
+            - name: CircuitBreaker
+              args:
+                name: inventoryServiceCircuitBreaker
+                fallbackUri: forward:/fallbackRoute
+
         - id: product_service_swagger
           uri: http://localhost:8080
           predicates:
             - Path=/aggregate/product-service/v3/api-docs/**
           filters:
             - SetPath=/api-docs
+            - name: CircuitBreaker
+              args:
+                name: productServiceSwaggerCircuitBreaker
+                fallbackUri: forward:/fallbackRoute
+
         - id: order_service_swagger
           uri: http://localhost:8081
           predicates:
             - Path=/aggregate/order-service/v3/api-docs/**
           filters:
             - SetPath=/api-docs
+            - name: CircuitBreaker
+              args:
+                name: orderServiceSwaggerCircuitBreaker
+                fallbackUri: forward:/fallbackRoute
+
         - id: inventory_service_swagger
           uri: http://localhost:8082
           predicates:
             - Path=/aggregate/inventory-service/v3/api-docs/**
           filters:
             - SetPath=/api-docs
+            - name: CircuitBreaker
+              args:
+                name: inventoryServiceSwaggerCircuitBreaker
+                fallbackUri: forward:/fallbackRoute
+resilience4j:
+  circuitbreaker:
+    configs:
+      default:
+        registerHealthIndicator: true
+        slidingWindowType: COUNT_BASED
+        slidingWindowSize: 10
+        failureRateThreshold: 50
+        waitDurationInOpenState: 5s
+        permittedNumberOfCallsInHalfOpenState: 3
+        automaticTransitionFromOpenToHalfOpenEnabled: true
+        minimum-number-of-calls: 5
+  timelimiter:
+    configs:
+      default:
+        timeout-duration: 3s
+  retry:
+    configs:
+      default:
+        max-attempts: 3
+        wait-duration: 2s
+management:
+  health:
+    circuitbreakers:
+      enabled: true
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+  endpoint:
+    health:
+      show-details: always
 springdoc:
   swagger-ui:
     path: /swagger-ui.html
