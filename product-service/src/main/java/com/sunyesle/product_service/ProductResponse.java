@@ -2,5 +2,5 @@ package com.sunyesle.product_service;
 
 import java.math.BigDecimal;
 
-public record ProductResponse(String id, String name, String description, BigDecimal price) {
+public record ProductResponse(String id, String name, String description, String skuCode, BigDecimal price) {
 }

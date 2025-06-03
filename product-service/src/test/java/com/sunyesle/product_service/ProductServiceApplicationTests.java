@@ -28,6 +28,7 @@ class ProductServiceApplicationTests {
                 {
                     "name": "블루투스 이어폰",
                     "description": "노이즈 캔슬링 기능을 갖춘 무선 이어폰입니다.",
+                    "skuCode": "AA000000",
                     "price": 89000
                 }
                 """;
@@ -42,6 +43,7 @@ class ProductServiceApplicationTests {
                 .body("id", Matchers.notNullValue())
                 .body("name", Matchers.equalTo("블루투스 이어폰"))
                 .body("description", Matchers.equalTo("노이즈 캔슬링 기능을 갖춘 무선 이어폰입니다."))
+                .body("skuCode", Matchers.equalTo("AA000000"))
                 .body("price", Matchers.equalTo(89000));
     }
 }
