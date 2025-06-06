@@ -1,7 +1,9 @@
 package com.sunyesle.order_service;
 
+import com.sunyesle.order_service.event.OrderPlacedEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.UUID;
@@ -13,10 +15,11 @@ public class OrderService {
 
     private final OrderRepository orderRepository;
     private final InventoryClient inventoryClient;
+    private final KafkaTemplate<String, OrderPlacedEvent> kafkaTemplate;
 
     public void placeOrder(OrderRequest orderRequest) {
         boolean isProductInStock = inventoryClient.isInStock(orderRequest.skuCode(), orderRequest.quantity());
-        if(!isProductInStock) {
+        if (!isProductInStock) {
             throw new RuntimeException("Product with SkuCode " + orderRequest.skuCode() + " is not in stock");
         }
 
@@ -27,5 +30,10 @@ public class OrderService {
                 orderRequest.quantity()
         );
         orderRepository.save(order);
+
+        OrderPlacedEvent orderPlacedEvent = new OrderPlacedEvent(order.getOrderNumber(), orderRequest.userDetails().email());
+        log.info("Start - Sending OrderPlacedEvent {} to Kafka topic order-placed", orderPlacedEvent);
+        kafkaTemplate.send("order-placed", orderPlacedEvent);
+        log.info("End - Sending OrderPlacedEvent {} to Kafka topic order-placed", orderPlacedEvent);
     }
 }

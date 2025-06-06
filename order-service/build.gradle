@@ -31,6 +31,7 @@ ext {
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
+	implementation 'org.springframework.kafka:spring-kafka'
 	implementation 'org.springframework.boot:spring-boot-starter-actuator'
 	implementation 'io.github.resilience4j:resilience4j-spring-boot3:2.2.0'
 	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.8'
@@ -42,10 +43,12 @@ dependencies {
 	runtimeOnly 'com.mysql:mysql-connector-j'
 	annotationProcessor 'org.projectlombok:lombok'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	testImplementation 'org.springframework.kafka:spring-kafka-test'
 	testImplementation 'org.springframework.boot:spring-boot-testcontainers'
 	testImplementation 'org.springframework.cloud:spring-cloud-starter-contract-stub-runner'
 	testImplementation 'org.testcontainers:junit-jupiter'
 	testImplementation 'org.testcontainers:mysql'
+	testImplementation 'org.testcontainers:kafka'
 	testImplementation 'io.rest-assured:rest-assured:5.5.2'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }

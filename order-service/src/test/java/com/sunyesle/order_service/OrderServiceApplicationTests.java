@@ -33,7 +33,12 @@ class OrderServiceApplicationTests {
 				{
 				    "skuCode": "AA000000",
 				    "price": 89000,
-				    "quantity": 1
+				    "quantity": 1,
+				    "userDetails": {
+				        "email": "test@gmail.com",
+				        "firstName": "John",
+				        "lastName": "Doe"
+				    }
 				}
 				""";
 		InventoryClientStub.stubInventoryCall("AA000000", 1);
