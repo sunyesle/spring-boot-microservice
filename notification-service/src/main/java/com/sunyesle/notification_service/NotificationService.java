@@ -26,13 +26,15 @@ public class NotificationService {
             messageHelper.setTo(orderPlacedEvent.getEmail());
             messageHelper.setSubject(String.format("Your Order with OrderNumber %s is placed successfully", orderPlacedEvent.getOrderNumber()));
             messageHelper.setText(String.format("""
-                            Hi
+                            Hi %s,%s
 
                             Your order with order number %s is now placed successfully.
                             
                             Best Regards
                             Spring Shop
                             """,
+                    orderPlacedEvent.getFirstName(),
+                    orderPlacedEvent.getLastName(),
                     orderPlacedEvent.getOrderNumber()));
         };
         try {
