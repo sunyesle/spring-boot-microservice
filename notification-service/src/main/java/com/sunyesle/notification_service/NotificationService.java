@@ -1,6 +1,6 @@
 package com.sunyesle.notification_service;
 
-import com.sunyesle.notification_service.event.OrderPlacedEvent;
+import com.sunyesle.order_service.event.OrderPlacedEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.annotation.KafkaListener;

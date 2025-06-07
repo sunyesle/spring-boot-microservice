@@ -1,7 +1,10 @@
+import com.github.davidmc24.gradle.plugin.avro.GenerateAvroJavaTask
+
 plugins {
 	id 'java'
 	id 'org.springframework.boot' version '3.5.0'
 	id 'io.spring.dependency-management' version '1.1.7'
+	id 'com.github.davidmc24.gradle.plugin.avro-base' version '1.9.1'
 }
 
 group = 'com.sunyesle'
@@ -21,12 +24,16 @@ configurations {
 
 repositories {
 	mavenCentral()
+	maven { url "https://packages.confluent.io/maven/" }
 }
 
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	implementation 'org.springframework.boot:spring-boot-starter-mail'
 	implementation 'org.springframework.kafka:spring-kafka'
+	implementation 'io.confluent:kafka-avro-serializer:7.9.1'
+	implementation 'io.confluent:kafka-schema-registry-client:7.9.1'
+	implementation 'org.apache.avro:avro:1.11.4'
 	compileOnly 'org.projectlombok:lombok'
 	annotationProcessor 'org.projectlombok:lombok'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
@@ -39,4 +46,20 @@ dependencies {
 
 tasks.named('test') {
 	useJUnitPlatform()
+}
+
+// avro
+def generateAvro = tasks.register("generateAvro", GenerateAvroJavaTask) {
+	source("src/main/resources/avro") // *.avsc 파일의 위치
+	outputDir = file("build/generated")
+}
+
+sourceSets {
+	getByName("main") {
+		java.srcDir("$buildDir/generated")
+	}
+}
+
+tasks.named("compileJava") {
+	dependsOn(generateAvro)
 }

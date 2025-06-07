@@ -1,0 +1,9 @@
+{
+  "type": "record",
+  "name": "OrderPlacedEvent",
+  "namespace": "com.sunyesle.order_service.event",
+  "fields": [
+    { "name": "orderNumber", "type": "string" },
+    { "name": "email", "type": "string" }
+  ]
+}
