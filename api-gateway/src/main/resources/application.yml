@@ -131,3 +131,5 @@ springdoc:
         url: /aggregate/inventory-service/v3/api-docs
   api-docs:
     path: /api-docs
+loki:
+  url: http://localhost:3100/loki/api/v1/push

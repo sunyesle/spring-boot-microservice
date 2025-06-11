@@ -34,6 +34,7 @@ dependencies {
 	implementation 'io.confluent:kafka-avro-serializer:7.9.1'
 	implementation 'io.confluent:kafka-schema-registry-client:7.9.1'
 	implementation 'org.apache.avro:avro:1.11.4'
+	implementation 'com.github.loki4j:loki-logback-appender:1.6.0'
 	compileOnly 'org.projectlombok:lombok'
 	annotationProcessor 'org.projectlombok:lombok'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'

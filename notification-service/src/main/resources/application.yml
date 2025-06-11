@@ -17,3 +17,5 @@ spring:
     port: 2525
     username: ${MAIL_USERNAME}
     password: ${MAIL_PASSWORD}
+loki:
+  url: http://localhost:3100/loki/api/v1/push
