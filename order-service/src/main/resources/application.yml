@@ -51,6 +51,15 @@ management:
   endpoint:
     health:
       show-details: always
+  metrics:
+    distribution:
+      percentiles-histogram:
+        http:
+          server:
+            requests: true
+  observations:
+    key-values:
+      application: order-service
 springdoc:
   swagger-ui:
     path: /swagger-ui.html

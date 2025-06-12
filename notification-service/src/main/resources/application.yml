@@ -17,5 +17,19 @@ spring:
     port: 2525
     username: ${MAIL_USERNAME}
     password: ${MAIL_PASSWORD}
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, info, metrics, prometheus
+  metrics:
+    distribution:
+      percentiles-histogram:
+        http:
+          server:
+            requests: true
+  observations:
+    key-values:
+      application: notification-service
 loki:
   url: http://localhost:3100/loki/api/v1/push
