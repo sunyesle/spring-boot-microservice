@@ -60,6 +60,9 @@ management:
   observations:
     key-values:
       application: order-service
+  tracing:
+    sampling:
+      probability: 1.0
 springdoc:
   swagger-ui:
     path: /swagger-ui.html

@@ -48,6 +48,8 @@ dependencies {
 	implementation 'org.flywaydb:flyway-mysql'
 	implementation 'com.github.loki4j:loki-logback-appender:1.6.0'
 	implementation 'io.micrometer:micrometer-registry-prometheus'
+	implementation 'io.micrometer:micrometer-tracing-bridge-brave'
+	implementation 'io.zipkin.reporter2:zipkin-reporter-brave'
 	compileOnly 'org.projectlombok:lombok'
 	runtimeOnly 'com.mysql:mysql-connector-j'
 	annotationProcessor 'org.projectlombok:lombok'

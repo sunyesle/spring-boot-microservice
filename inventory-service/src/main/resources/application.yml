@@ -33,6 +33,9 @@ management:
   observations:
     key-values:
       application: inventory-service
+  tracing:
+    sampling:
+      probability: 1.0
 loki:
   url: http://localhost:3100/loki/api/v1/push
 
