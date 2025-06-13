@@ -17,6 +17,7 @@ spring:
   kafka:
     bootstrap-servers: localhost:9092
     template:
+      observation-enabled: true 
       default-topic: order-placed
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
