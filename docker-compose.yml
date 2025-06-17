@@ -89,7 +89,7 @@ services:
       DB_USER: keycloak
       DB_PASSWORD: password
       KEYCLOAK_ADMIN: admin
-      KEYCLOAK_ADMIN_PASSWORD: password
+      KEYCLOAK_ADMIN_PASSWORD: admin
     ports:
       - "8181:8080"
     volumes:
