@@ -5,4 +5,18 @@ subprojects {
 	repositories {
 		mavenCentral()
 	}
+
+	plugins.withId('org.springframework.boot') {
+		bootBuildImage {
+			builder = 'paketobuildpacks/builder-jammy-tiny'
+			imageName = "sunyesle/${project.name}"
+			publish = true
+			docker {
+				publishRegistry {
+					username = "${dockerUsername}"
+					password = "${dockerPassword}"
+				}
+			}
+		}
+	}
 }
