@@ -41,7 +41,7 @@ class OrderServiceApplicationTests {
 				    }
 				}
 				""";
-		InventoryClientStub.stubInventoryCall("AA000000", 1);
+		InventoryClientStub.stubInventoryCall("AA000000", 1, true);
 
 		RestAssured.given()
 				.contentType(ContentType.JSON)
@@ -51,5 +51,30 @@ class OrderServiceApplicationTests {
 				.then()
 				.statusCode(201)
 				.body(Matchers.equalTo("Order Placed Successfully"));
+	}
+
+	@Test
+	void 재고가_부족할_경우_주문_생성에_실패한다() {
+		String requestBody = """
+				{
+				    "skuCode": "AA000000",
+				    "price": 89000,
+				    "quantity": 1,
+				    "userDetails": {
+				        "email": "test@gmail.com",
+				        "firstName": "John",
+				        "lastName": "Doe"
+				    }
+				}
+				""";
+		InventoryClientStub.stubInventoryCall("AA000000", 1, false);
+
+		RestAssured.given()
+				.contentType(ContentType.JSON)
+				.body(requestBody)
+				.when()
+				.post("/api/orders")
+				.then()
+				.statusCode(500);
 	}
 }
