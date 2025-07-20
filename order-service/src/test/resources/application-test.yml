@@ -1,2 +1,7 @@
+spring:
+  kafka:
+    producer:
+      properties:
+        schema.registry.url: mock://test
 inventory:
   url: http://localhost:${wiremock.server.port}
