@@ -14,6 +14,17 @@ spring:
       hibernate:
         globally_quoted_identifiers: true
         globally_quoted_identifiers_skip_column_definitions: true
+  kafka:
+    bootstrap-servers: localhost:9092
+    listener:
+      observation-enabled: true
+    consumer:
+      group-id: inventory-service
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: io.confluent.kafka.serializers.KafkaAvroDeserializer
+      properties:
+        schema.registry.url: http://localhost:8085
+        specific.avro.reader: true
 springdoc:
   swagger-ui:
     path: /swagger-ui.html

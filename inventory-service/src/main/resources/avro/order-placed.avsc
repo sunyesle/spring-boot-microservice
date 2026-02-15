@@ -1,0 +1,13 @@
+{
+  "type": "record",
+  "name": "OrderPlacedEvent",
+  "namespace": "com.sunyesle.order_service.event",
+  "fields": [
+    { "name": "orderNumber", "type": "string" },
+    { "name": "email", "type": "string" },
+    { "name": "firstName", "type": "string" },
+    { "name": "lastName", "type": "string" },
+    { "name": "skuCode", "type": "string", "default": "" },
+    { "name": "quantity", "type": "int", "default": 0 }
+  ]
+}
