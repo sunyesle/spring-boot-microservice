@@ -36,7 +36,9 @@ public class OrderService {
                 order.getOrderNumber(),
                 orderRequest.userDetails().email(),
                 orderRequest.userDetails().firstName(),
-                orderRequest.userDetails().lastName()
+                orderRequest.userDetails().lastName(),
+                order.getSkuCode(),
+                order.getQuantity()
         );
         log.info("Start - Sending OrderPlacedEvent {} to Kafka topic order-placed", orderPlacedEvent);
         kafkaTemplate.send("order-placed", orderPlacedEvent);
