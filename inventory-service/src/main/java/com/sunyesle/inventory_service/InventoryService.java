@@ -1,7 +1,9 @@
 package com.sunyesle.inventory_service;
 
+import com.sunyesle.order_service.event.OrderPlacedEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,5 +25,15 @@ public class InventoryService {
     @Transactional(readOnly = true)
     public boolean isInStock(String skuCode, Integer quantity) {
         return inventoryRepository.existsBySkuCodeAndQuantityIsGreaterThanEqual(skuCode, quantity);
+    }
+
+    @KafkaListener(topics = "order-placed")
+    @Transactional
+    public void decreaseStock(OrderPlacedEvent orderPlacedEvent) {
+        log.info("Got Message from order-placed topic {}", orderPlacedEvent);
+        Inventory inventory = inventoryRepository.findBySkuCode(orderPlacedEvent.getSkuCode())
+                .orElseThrow(() -> new RuntimeException("Inventory not found"));
+
+        inventory.decrease(orderPlacedEvent.getQuantity());
     }
 }

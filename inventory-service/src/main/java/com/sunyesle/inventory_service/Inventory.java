@@ -22,4 +22,14 @@ public class Inventory {
         this.skuCode = skuCode;
         this.quantity = quantity;
     }
+
+    public void decrease(int quantity) {
+        if(quantity <= 0) {
+            throw new IllegalArgumentException("Quantity must be greater than 0");
+        }
+        if(this.quantity < quantity) {
+            throw new RuntimeException("Not enough stock. Current: " + this.quantity + ", Requested: " + quantity);
+        }
+        this.quantity -= quantity;
+    }
 }
