@@ -21,11 +21,14 @@ public class Order {
     private String skuCode;
     private BigDecimal price;
     private Integer quantity;
+    @Enumerated(EnumType.STRING)
+    private OrderStatus status;
 
     public Order(String orderNumber, String skuCode, BigDecimal price, Integer quantity) {
         this.orderNumber = orderNumber;
         this.skuCode = skuCode;
         this.price = price;
         this.quantity = quantity;
+        this.status = OrderStatus.PENDING;
     }
 }
