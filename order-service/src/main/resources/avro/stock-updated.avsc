@@ -1,0 +1,16 @@
+{
+  "type": "record",
+  "name": "StockUpdatedEvent",
+  "namespace": "com.sunyesle.inventory_service.event",
+  "fields": [
+    { "name": "orderNumber", "type": "string" },
+    {
+      "name": "status",
+      "type": {
+        "type": "enum",
+        "name": "StockUpdatedStatus",
+        "symbols": ["SUCCESS", "FAILURE"]
+      }
+    }
+  ]
+}

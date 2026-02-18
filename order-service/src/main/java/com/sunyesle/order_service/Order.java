@@ -31,4 +31,15 @@ public class Order {
         this.quantity = quantity;
         this.status = OrderStatus.PENDING;
     }
+
+    public void confirm() {
+        if(this.status != OrderStatus.PENDING){
+            throw new IllegalStateException("Order can only be confirmed if it is in PENDING status");
+        }
+        this.status = OrderStatus.CONFIRMED;
+    }
+
+    public void cancel() {
+        this.status = OrderStatus.CANCELLED;
+    }
 }
