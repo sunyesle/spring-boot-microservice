@@ -51,6 +51,6 @@ public class InventoryService {
     }
 
     private void publishEvent(String orderNumber, StockUpdatedStatus status) {
-        kafkaTemplate.send("stock-updated", new StockUpdatedEvent(orderNumber, status));
+        kafkaTemplate.send("stock-updated", orderNumber, new StockUpdatedEvent(orderNumber, status));
     }
 }

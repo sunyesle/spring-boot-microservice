@@ -44,7 +44,7 @@ public class OrderService {
                 order.getQuantity()
         );
         log.info("Start - Sending OrderPlacedEvent {} to Kafka topic order-placed", orderPlacedEvent);
-        kafkaTemplate.send("order-placed", orderPlacedEvent);
+        kafkaTemplate.send("order-placed", order.getOrderNumber(), orderPlacedEvent);
         log.info("End - Sending OrderPlacedEvent {} to Kafka topic order-placed", orderPlacedEvent);
     }
 
