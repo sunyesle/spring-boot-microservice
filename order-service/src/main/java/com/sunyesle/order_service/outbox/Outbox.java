@@ -1,4 +1,4 @@
-package com.sunyesle.order_service;
+package com.sunyesle.order_service.outbox;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;

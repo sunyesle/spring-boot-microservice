@@ -1,25 +1,39 @@
 package com.sunyesle.order_service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sunyesle.inventory_service.event.StockUpdatedEvent;
 import com.sunyesle.inventory_service.event.StockUpdatedStatus;
 import com.sunyesle.order_service.event.OrderPlacedEvent;
-import lombok.RequiredArgsConstructor;
+import com.sunyesle.order_service.outbox.Outbox;
+import com.sunyesle.order_service.outbox.OutboxRepository;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.kafka.annotation.KafkaListener;
-import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.UUID;
 
 @Service
-@RequiredArgsConstructor
 @Slf4j
 public class OrderService {
 
     private final OrderRepository orderRepository;
+    private final OutboxRepository outboxRepository;
     private final InventoryClient inventoryClient;
-    private final KafkaTemplate<String, OrderPlacedEvent> kafkaTemplate;
+    private final ObjectMapper avroObjectMapper;
+
+    public OrderService(
+            OrderRepository orderRepository,
+            OutboxRepository outboxRepository,
+            InventoryClient inventoryClient,
+            @Qualifier("avroObjectMapper") ObjectMapper avroObjectMapper) {
+        this.orderRepository = orderRepository;
+        this.outboxRepository = outboxRepository;
+        this.inventoryClient = inventoryClient;
+        this.avroObjectMapper = avroObjectMapper;
+    }
 
     @Transactional
     public void placeOrder(OrderRequest orderRequest) {
@@ -35,7 +49,8 @@ public class OrderService {
                 orderRequest.quantity()
         );
         orderRepository.save(order);
-        OrderPlacedEvent orderPlacedEvent = new OrderPlacedEvent(
+
+        OrderPlacedEvent event = new OrderPlacedEvent(
                 order.getOrderNumber(),
                 orderRequest.userDetails().email(),
                 orderRequest.userDetails().firstName(),
@@ -43,9 +58,17 @@ public class OrderService {
                 order.getSkuCode(),
                 order.getQuantity()
         );
-        log.info("Start - Sending OrderPlacedEvent {} to Kafka topic order-placed", orderPlacedEvent);
-        kafkaTemplate.send("order-placed", order.getOrderNumber(), orderPlacedEvent);
-        log.info("End - Sending OrderPlacedEvent {} to Kafka topic order-placed", orderPlacedEvent);
+        try {
+            String payload = avroObjectMapper.writeValueAsString(event);
+            Outbox outbox = new Outbox(
+                    order.getOrderNumber(),
+                    "order-placed",
+                    payload
+            );
+            outboxRepository.save(outbox);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException("Serialization failed", e);
+        }
     }
 
     @KafkaListener(topics = "stock-updated")
