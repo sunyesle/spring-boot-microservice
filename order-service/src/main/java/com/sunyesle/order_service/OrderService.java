@@ -1,14 +1,11 @@
 package com.sunyesle.order_service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sunyesle.inventory_service.event.StockUpdatedEvent;
 import com.sunyesle.inventory_service.event.StockUpdatedStatus;
 import com.sunyesle.order_service.event.OrderPlacedEvent;
-import com.sunyesle.order_service.outbox.Outbox;
-import com.sunyesle.order_service.outbox.OutboxRepository;
+import com.sunyesle.order_service.outbox.OutboxWriter;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,24 +13,13 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.UUID;
 
 @Service
+@RequiredArgsConstructor
 @Slf4j
 public class OrderService {
 
     private final OrderRepository orderRepository;
-    private final OutboxRepository outboxRepository;
     private final InventoryClient inventoryClient;
-    private final ObjectMapper avroObjectMapper;
-
-    public OrderService(
-            OrderRepository orderRepository,
-            OutboxRepository outboxRepository,
-            InventoryClient inventoryClient,
-            @Qualifier("avroObjectMapper") ObjectMapper avroObjectMapper) {
-        this.orderRepository = orderRepository;
-        this.outboxRepository = outboxRepository;
-        this.inventoryClient = inventoryClient;
-        this.avroObjectMapper = avroObjectMapper;
-    }
+    private final OutboxWriter outboxWriter;
 
     @Transactional
     public void placeOrder(OrderRequest orderRequest) {
@@ -58,17 +44,7 @@ public class OrderService {
                 order.getSkuCode(),
                 order.getQuantity()
         );
-        try {
-            String payload = avroObjectMapper.writeValueAsString(event);
-            Outbox outbox = new Outbox(
-                    order.getOrderNumber(),
-                    "order-placed",
-                    payload
-            );
-            outboxRepository.save(outbox);
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException("Serialization failed", e);
-        }
+        outboxWriter.write(order.getOrderNumber(), "order-placed", event);
     }
 
     @KafkaListener(topics = "stock-updated")
