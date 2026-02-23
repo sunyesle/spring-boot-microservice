@@ -3,9 +3,10 @@ package com.sunyesle.order_service;
 import com.sunyesle.inventory_service.event.StockUpdatedEvent;
 import com.sunyesle.inventory_service.event.StockUpdatedStatus;
 import com.sunyesle.order_service.event.OrderPlacedEvent;
-import com.sunyesle.order_service.outbox.OutboxWriter;
+import com.sunyesle.order_service.outbox.OutboxEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,7 +20,7 @@ public class OrderService {
 
     private final OrderRepository orderRepository;
     private final InventoryClient inventoryClient;
-    private final OutboxWriter outboxWriter;
+    private final ApplicationEventPublisher publisher;
 
     @Transactional
     public void placeOrder(OrderRequest orderRequest) {
@@ -36,7 +37,7 @@ public class OrderService {
         );
         orderRepository.save(order);
 
-        OrderPlacedEvent event = new OrderPlacedEvent(
+        OrderPlacedEvent payload = new OrderPlacedEvent(
                 order.getOrderNumber(),
                 orderRequest.userDetails().email(),
                 orderRequest.userDetails().firstName(),
@@ -44,7 +45,8 @@ public class OrderService {
                 order.getSkuCode(),
                 order.getQuantity()
         );
-        outboxWriter.write(order.getOrderNumber(), "order-placed", event);
+        OutboxEvent event = new OutboxEvent(order.getOrderNumber(), "order-placed", payload);
+        publisher.publishEvent(event);
     }
 
     @KafkaListener(topics = "stock-updated")
