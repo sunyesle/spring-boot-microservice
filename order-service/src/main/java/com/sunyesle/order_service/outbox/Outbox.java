@@ -4,9 +4,8 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 
 @Entity
@@ -14,7 +13,6 @@ import java.time.LocalDateTime;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-@EntityListeners(AuditingEntityListener.class)
 public class Outbox {
 
     @Id
@@ -23,17 +21,37 @@ public class Outbox {
     private String aggregateId;
     private String eventType;
     private String payload;
-    @CreatedDate
+    @Enumerated(EnumType.STRING)
+    private OutboxStatus status;
     private LocalDateTime createdAt;
-    private LocalDateTime processedAt;
+    private LocalDateTime completedAt;
+    private int failureCount;
+    private LocalDateTime nextRetryAt;
 
     public Outbox(String aggregateId, String eventType, String payload) {
         this.aggregateId = aggregateId;
         this.eventType = eventType;
         this.payload = payload;
+        this.status = OutboxStatus.NEW;
+        this.createdAt = LocalDateTime.now();
+        this.failureCount = 0;
+        this.nextRetryAt = LocalDateTime.now();
     }
 
-    public void processed() {
-        this.processedAt = LocalDateTime.now();
+    public void markCompleted() {
+        this.completedAt = LocalDateTime.now();
+        this.status = OutboxStatus.COMPLETED;
+    }
+
+    public void markFailed() {
+        this.status = OutboxStatus.FAILED;
+    }
+
+    public void incrementFailureCount() {
+        this.failureCount++;
+    }
+
+    public void scheduleNextRetry(Duration delay) {
+        this.nextRetryAt = LocalDateTime.now().plus(delay);
     }
 }

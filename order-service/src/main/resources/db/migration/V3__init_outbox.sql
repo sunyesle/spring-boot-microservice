@@ -4,7 +4,10 @@ CREATE TABLE `outbox`
     `aggregate_id`  VARCHAR(255) NOT NULL,
     `event_type`    VARCHAR(255) NOT NULL,
     `payload`       TEXT         NOT NULL,
+    `status`        VARCHAR(20)  NOT NULL,
     `created_at`    DATETIME(6)  NOT NULL,
-    `processed_at`  DATETIME(6)  NULL,
+    `completed_at`  DATETIME(6)  NULL,
+    `failure_count` INT          NOT NULL,
+    `next_retry_at` DATETIME(6)  NOT NULL,
     PRIMARY KEY (`id`)
 );
