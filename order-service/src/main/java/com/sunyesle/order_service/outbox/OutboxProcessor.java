@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sunyesle.order_service.event.OrderPlacedEvent;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;
 
@@ -18,6 +19,15 @@ public class OutboxProcessor {
     private final KafkaTemplate<String, Object> kafkaTemplate;
     private final OutboxService outboxService;
     private final ObjectMapper avroObjectMapper;
+
+    @Value("${outbox.retry.max-retries}")
+    private long maxRetries;
+
+    @Value("${outbox.retry.initial-delay}")
+    private long initialDelay;
+
+    @Value("${outbox.retry.multiplier}")
+    private double multiplier;
 
     public OutboxProcessor(
             KafkaTemplate<String, Object> kafkaTemplate,
@@ -45,15 +55,15 @@ public class OutboxProcessor {
         } catch (Exception e) {
             log.error("Outbox {} failed: {}", outbox.getId(), e.getMessage());
 
-            if (outbox.getFailureCount() >= 5) {
+            if (outbox.getFailureCount() >= maxRetries) {
                 outboxService.markFailed(outbox.getId());
 
                 log.error("Outbox {} marked as FAILED", outbox.getId());
             } else {
-                long delaySeconds = (long) Math.pow(2, outbox.getFailureCount()) * 5;
-                outboxService.scheduleNextRetry(outbox.getId(), Duration.ofSeconds(delaySeconds));
+                long delayMillis = (long) (initialDelay * Math.pow(multiplier, outbox.getFailureCount()));
+                outboxService.scheduleNextRetry(outbox.getId(), Duration.ofMillis(delayMillis));
 
-                log.warn("Outbox {} retry scheduled: {}s", outbox.getId(), delaySeconds);
+                log.warn("Outbox {} retry scheduled: {}ms", outbox.getId(), delayMillis);
             }
         }
     }

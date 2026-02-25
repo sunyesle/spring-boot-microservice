@@ -80,3 +80,8 @@ inventory:
   url: http://localhost:8082
 loki:
   url: http://localhost:3100/loki/api/v1/push
+outbox:
+  retry:
+    max-retries: 5
+    initial-delay: 5000
+    multiplier: 2.0
