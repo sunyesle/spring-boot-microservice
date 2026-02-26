@@ -3,9 +3,10 @@ package com.sunyesle.order_service.outbox;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sunyesle.order_service.event.OrderPlacedEvent;
+import com.sunyesle.order_service.outbox.retry.OutboxRetryPolicy;
+import com.sunyesle.order_service.outbox.retry.OutboxRetryProperties;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;
 
@@ -19,23 +20,20 @@ public class OutboxProcessor {
     private final KafkaTemplate<String, Object> kafkaTemplate;
     private final OutboxService outboxService;
     private final ObjectMapper avroObjectMapper;
-
-    @Value("${outbox.retry.max-retries}")
-    private long maxRetries;
-
-    @Value("${outbox.retry.initial-delay}")
-    private long initialDelay;
-
-    @Value("${outbox.retry.multiplier}")
-    private double multiplier;
+    private final OutboxRetryPolicy outboxRetryPolicy;
+    private final OutboxRetryProperties outboxRetryProperties;
 
     public OutboxProcessor(
             KafkaTemplate<String, Object> kafkaTemplate,
             OutboxService outboxService,
-            @Qualifier("avroObjectMapper") ObjectMapper avroObjectMapper) {
+            @Qualifier("avroObjectMapper") ObjectMapper avroObjectMapper,
+            OutboxRetryPolicy outboxRetryPolicy,
+            OutboxRetryProperties outboxRetryProperties) {
         this.kafkaTemplate = kafkaTemplate;
         this.outboxService = outboxService;
         this.avroObjectMapper = avroObjectMapper;
+        this.outboxRetryPolicy = outboxRetryPolicy;
+        this.outboxRetryProperties = outboxRetryProperties;
     }
 
     public void processAll() {
@@ -55,12 +53,12 @@ public class OutboxProcessor {
         } catch (Exception e) {
             log.error("Outbox {} failed: {}", outbox.getId(), e.getMessage());
 
-            if (outbox.getFailureCount() >= maxRetries) {
+            if (outbox.getFailureCount() >= outboxRetryProperties.getMaxRetries()) {
                 outboxService.markFailed(outbox.getId());
 
                 log.error("Outbox {} marked as FAILED", outbox.getId());
             } else {
-                long delayMillis = (long) (initialDelay * Math.pow(multiplier, outbox.getFailureCount()));
+                long delayMillis = outboxRetryPolicy.calculateDelay(outbox.getFailureCount());
                 outboxService.scheduleNextRetry(outbox.getId(), Duration.ofMillis(delayMillis));
 
                 log.warn("Outbox {} retry scheduled: {}ms", outbox.getId(), delayMillis);
