@@ -1,6 +1,6 @@
 package com.sunyesle.order_service.config;
 
-import com.sunyesle.order_service.InventoryClient;
+import com.sunyesle.order_service.inventory.InventoryClient;
 import io.micrometer.observation.ObservationRegistry;
 import lombok.RequiredArgsConstructor;
 import org.apache.hc.client5.http.config.RequestConfig;
