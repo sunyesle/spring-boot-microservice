@@ -27,6 +27,13 @@ public class InventoryService {
     }
 
     @Transactional(readOnly = true)
+    public InventoryResponse getStock(String skuCode) {
+        Inventory inventory = inventoryRepository.findBySkuCode(skuCode)
+                .orElseThrow(() -> new RuntimeException("Inventory not found"));
+        return new InventoryResponse(inventory.getId(), inventory.getSkuCode(), inventory.getQuantity());
+    }
+
+    @Transactional(readOnly = true)
     public boolean isInStock(String skuCode, Integer quantity) {
         return inventoryRepository.existsBySkuCodeAndQuantityIsGreaterThanEqual(skuCode, quantity);
     }
@@ -36,7 +43,7 @@ public class InventoryService {
     public void decreaseStock(OrderPlacedEvent orderPlacedEvent) {
         log.info("Got Message from order-placed topic {}", orderPlacedEvent);
         try {
-            Inventory inventory = inventoryRepository.findBySkuCode(orderPlacedEvent.getSkuCode())
+            Inventory inventory = inventoryRepository.findBySkuCodeWithLock(orderPlacedEvent.getSkuCode())
                     .orElseThrow(() -> new RuntimeException("Inventory not found"));
 
             inventory.decrease(orderPlacedEvent.getQuantity());

@@ -18,6 +18,11 @@ public class InventoryController {
         return inventoryService.addStock(request);
     }
 
+    @GetMapping("/{skuCode}")
+    public InventoryResponse getStock(@PathVariable String skuCode) {
+        return inventoryService.getStock(skuCode);
+    }
+
     @GetMapping
     public boolean isInStock(@RequestParam String skuCode, @RequestParam Integer quantity) {
         return inventoryService.isInStock(skuCode, quantity);
