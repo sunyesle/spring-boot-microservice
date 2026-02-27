@@ -1,4 +1,4 @@
-package com.sunyesle.order_service;
+package com.sunyesle.order_service.config;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.apache.avro.Schema;
