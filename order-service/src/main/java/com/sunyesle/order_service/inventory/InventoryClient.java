@@ -13,17 +13,22 @@ public interface InventoryClient {
     Logger log = LoggerFactory.getLogger(InventoryClient.class);
 
     @GetExchange("/api/inventory")
-    @CircuitBreaker(name = "inventory", fallbackMethod = "fallbackMethod")
+    @CircuitBreaker(name = "inventory", fallbackMethod = "isInStockFallback")
     @Retry(name = "inventory")
     boolean isInStock(@RequestParam String skuCode, @RequestParam Integer quantity);
 
     @GetExchange("/api/inventory/{skuCode}")
-    @CircuitBreaker(name = "inventory", fallbackMethod = "fallbackMethod")
+    @CircuitBreaker(name = "inventory", fallbackMethod = "getStockFallback")
     @Retry(name = "inventory")
     InventoryResponse getStock(@PathVariable String skuCode);
 
-    default boolean fallbackMethod(String skuCode, Integer quantity, Throwable throwable) {
+    default boolean isInStockFallback(String skuCode, Integer quantity, Throwable throwable) {
         log.info("Cannot get inventory for skuCode {}, failure reason: {}", skuCode, throwable.getMessage());
         return false;
+    }
+
+    default InventoryResponse getStockFallback(String skuCode, Throwable throwable) {
+        log.info("Cannot get inventory for skuCode {}, failure reason: {}", skuCode, throwable.getMessage());
+        return new InventoryResponse(0L, skuCode, 0);
     }
 }
