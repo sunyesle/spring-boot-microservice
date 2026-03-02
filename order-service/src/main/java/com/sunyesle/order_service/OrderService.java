@@ -3,8 +3,7 @@ package com.sunyesle.order_service;
 import com.sunyesle.inventory_service.event.StockUpdatedEvent;
 import com.sunyesle.inventory_service.event.StockUpdatedStatus;
 import com.sunyesle.order_service.event.OrderPlacedEvent;
-import com.sunyesle.order_service.inventory.InventoryClient;
-import com.sunyesle.order_service.inventory.InventoryResponse;
+import com.sunyesle.order_service.inventory.InventoryGateway;
 import com.sunyesle.order_service.outbox.OutboxEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,13 +20,13 @@ import java.util.UUID;
 public class OrderService {
 
     private final OrderRepository orderRepository;
-    private final InventoryClient inventoryClient;
+    private final InventoryGateway inventoryGateway;
     private final ApplicationEventPublisher publisher;
 
     @Transactional
     public void placeOrder(OrderRequest orderRequest) {
-        InventoryResponse inventory = inventoryClient.getStock(orderRequest.skuCode());
-        if (inventory.quantity() < orderRequest.quantity()) {
+        Integer stockQuantity = inventoryGateway.getStock(orderRequest.skuCode());
+        if (stockQuantity < orderRequest.quantity()) {
             throw new RuntimeException("Product with SkuCode " + orderRequest.skuCode() + " is not in stock");
         }
 
