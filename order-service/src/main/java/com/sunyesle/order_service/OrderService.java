@@ -25,8 +25,7 @@ public class OrderService {
 
     @Transactional
     public void placeOrder(OrderRequest orderRequest) {
-        Integer stockQuantity = inventoryGateway.getStock(orderRequest.skuCode());
-        if (stockQuantity < orderRequest.quantity()) {
+        if (!inventoryGateway.isInStock(orderRequest.skuCode(), orderRequest.quantity())) {
             throw new RuntimeException("Product with SkuCode " + orderRequest.skuCode() + " is not in stock");
         }
 
