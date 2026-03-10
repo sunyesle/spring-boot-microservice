@@ -88,6 +88,6 @@ outbox:
     policy: exponential
     max-retries: 5
     exponential:
-      initial-delay: 5000
+      initial-delay: 15000
       max-delay: 60000
       multiplier: 2.0

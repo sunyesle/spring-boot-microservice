@@ -1,6 +1,7 @@
 package com.sunyesle.order_service.outbox;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,9 +18,12 @@ public class OutboxService {
 
     @Transactional(readOnly = true)
     public List<Outbox> getReadyOutboxes() {
-        return outboxRepository.findTop10ByStatusAndNextRetryAtLessThanEqualOrderByNextRetryAtAsc(
+        LocalDateTime now = LocalDateTime.now();
+        return outboxRepository.findReadyOutboxes(
                 OutboxStatus.NEW,
-                LocalDateTime.now()
+                now,
+                now.minusSeconds(15),
+                PageRequest.of(0, 10)
         );
     }
 

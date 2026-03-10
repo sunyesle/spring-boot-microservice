@@ -10,7 +10,7 @@ public class OutboxScheduler {
 
     private final OutboxProcessor outboxProcessor;
 
-    @Scheduled(fixedDelay = 5000)
+    @Scheduled(fixedDelay = 30000)
     public void processOutbox() {
         outboxProcessor.processAll();
     }
