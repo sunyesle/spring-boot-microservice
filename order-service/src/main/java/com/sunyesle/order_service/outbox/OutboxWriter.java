@@ -21,7 +21,7 @@ public class OutboxWriter {
     }
 
     @Transactional(propagation = Propagation.MANDATORY)
-    public void write(String aggregateId, String eventType, Object event) {
+    public Outbox write(String aggregateId, String eventType, Object event) {
         try {
             String payload = avroObjectMapper.writeValueAsString(event);
             Outbox outbox = new Outbox(
@@ -29,7 +29,7 @@ public class OutboxWriter {
                     eventType,
                     payload
             );
-            outboxRepository.save(outbox);
+            return outboxRepository.save(outbox);
         } catch (JsonProcessingException e) {
             throw new RuntimeException("Serialization failed", e);
         }

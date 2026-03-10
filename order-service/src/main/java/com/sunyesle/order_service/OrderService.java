@@ -37,7 +37,7 @@ public class OrderService {
         );
         orderRepository.save(order);
 
-        OrderPlacedEvent payload = new OrderPlacedEvent(
+        OrderPlacedEvent data = new OrderPlacedEvent(
                 order.getOrderNumber(),
                 orderRequest.userDetails().email(),
                 orderRequest.userDetails().firstName(),
@@ -45,7 +45,7 @@ public class OrderService {
                 order.getSkuCode(),
                 order.getQuantity()
         );
-        OutboxEvent event = new OutboxEvent(order.getOrderNumber(), "order-placed", payload);
+        OutboxEvent event = new OutboxEvent(order.getOrderNumber(), "order-placed", data);
         publisher.publishEvent(event);
     }
 

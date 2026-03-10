@@ -23,6 +23,11 @@ public class OutboxService {
         );
     }
 
+    @Transactional(readOnly = true)
+    public Outbox getOutbox(long outboxId) {
+        return findOutboxById(outboxId);
+    }
+
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void markCompleted(Long id) {
         Outbox outbox = findOutboxById(id);

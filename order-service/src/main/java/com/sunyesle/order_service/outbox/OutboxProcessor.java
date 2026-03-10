@@ -40,6 +40,10 @@ public class OutboxProcessor {
         outboxService.getReadyOutboxes().forEach(this::processInternal);
     }
 
+    public void process(long outboxId) {
+        processInternal(outboxService.getOutbox(outboxId));
+    }
+
     private void processInternal(Outbox outbox) {
         try {
             log.info("Outbox {} sending: attempt {}", outbox.getId(), outbox.getFailureCount() + 1);

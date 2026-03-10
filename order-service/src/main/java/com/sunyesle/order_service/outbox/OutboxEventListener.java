@@ -10,9 +10,16 @@ import org.springframework.transaction.event.TransactionalEventListener;
 public class OutboxEventListener {
 
     private final OutboxWriter outboxWriter;
+    private final OutboxProcessor outboxProcessor;
 
     @TransactionalEventListener(phase = TransactionPhase.BEFORE_COMMIT)
     public void saveOutbox(OutboxEvent event) {
-        outboxWriter.write(event.aggregateId(), event.eventType(), event.payload());
+        Outbox outbox = outboxWriter.write(event.getAggregateId(), event.getEventType(), event.getData());
+        event.setOutboxId(outbox.getId());
+    }
+
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+    public void processOutbox(OutboxEvent event) {
+        outboxProcessor.process(event.getOutboxId());
     }
 }
